@@ -1,0 +1,624 @@
+{
+  "cases": [
+    {
+      "name": "speech eleven_v3 with voice id and metadata",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "Hello there.",
+            "voice": "VoiceAbc123",
+            "metadata": {
+              "voice_settings": {
+                "stability": 0.4
+              },
+              "language_code": "en",
+              "seed": 7
+            }
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/text-to-speech/VoiceAbc123?output_format=mp3_44100_128",
+        "method": "POST",
+        "body": {
+          "text": "Hello there.",
+          "model_id": "eleven_v3",
+          "voice_settings": {
+            "stability": 0.4
+          },
+          "language_code": "en",
+          "seed": 7
+        },
+        "stream": false,
+        "state": {
+          "model": "eleven_v3",
+          "kind": "tts",
+          "format": "mp3_44100_128"
+        }
+      }
+    },
+    {
+      "name": "speech OpenAI voice uses the channel default, wav, zero retention",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {
+            "defaultVoiceId": "MyVoice42",
+            "zeroRetention": true
+          }
+        },
+        {
+          "body": {
+            "model": "eleven_v4",
+            "input": "你好，世界",
+            "voice": "alloy",
+            "response_format": "wav"
+          },
+          "model": "eleven_v4",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/text-to-speech/MyVoice42?output_format=wav_44100&enable_logging=false",
+        "method": "POST",
+        "body": {
+          "text": "你好，世界",
+          "model_id": "eleven_v4"
+        },
+        "stream": false,
+        "state": {
+          "model": "eleven_v4",
+          "kind": "tts",
+          "format": "wav_44100"
+        }
+      }
+    },
+    {
+      "name": "speech mapped model, speed into voice_settings",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "tts-1",
+            "input": "Quick test.",
+            "voice": "alloy",
+            "speed": 1.1
+          },
+          "model": "eleven_flash_v2_5",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128",
+        "method": "POST",
+        "body": {
+          "text": "Quick test.",
+          "model_id": "eleven_flash_v2_5",
+          "voice_settings": {
+            "speed": 1.1
+          }
+        },
+        "stream": false,
+        "state": {
+          "model": "eleven_flash_v2_5",
+          "kind": "tts",
+          "format": "mp3_44100_128"
+        }
+      }
+    },
+    {
+      "name": "speech metadata.output_format",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_multilingual_v2",
+            "input": "Hi",
+            "voice": "alloy",
+            "metadata": {
+              "output_format": "pcm_44100"
+            }
+          },
+          "model": "eleven_multilingual_v2",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=pcm_44100",
+        "method": "POST",
+        "body": {
+          "text": "Hi",
+          "model_id": "eleven_multilingual_v2"
+        },
+        "stream": false,
+        "state": {
+          "model": "eleven_multilingual_v2",
+          "kind": "tts",
+          "format": "pcm_44100"
+        }
+      }
+    },
+    {
+      "name": "music with billed length",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "music_v2_5",
+            "input": "Warm lo-fi hip hop with soft rain",
+            "voice": "alloy",
+            "metadata": {
+              "music_length_ms": 30000,
+              "force_instrumental": true
+            }
+          },
+          "model": "music_v2_5",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/music?output_format=mp3_44100_128",
+        "method": "POST",
+        "body": {
+          "prompt": "Warm lo-fi hip hop with soft rain",
+          "model_id": "music_v2_5",
+          "music_length_ms": 30000,
+          "force_instrumental": true
+        },
+        "stream": false,
+        "state": {
+          "model": "music_v2_5",
+          "kind": "music",
+          "format": "mp3_44100_128"
+        }
+      }
+    },
+    {
+      "name": "sound effect with billed duration",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_text_to_sound_v3",
+            "input": "Old wooden door creaking open",
+            "voice": "alloy",
+            "metadata": {
+              "duration_seconds": 2.5,
+              "loop": false,
+              "prompt_influence": 0.5
+            }
+          },
+          "model": "eleven_text_to_sound_v3",
+          "stream": false
+        }
+      ],
+      "expected": {
+        "path": "/v1/sound-generation?output_format=mp3_44100_128",
+        "method": "POST",
+        "body": {
+          "text": "Old wooden door creaking open",
+          "model_id": "eleven_text_to_sound_v3",
+          "duration_seconds": 2.5,
+          "loop": false,
+          "prompt_influence": 0.5
+        },
+        "stream": false,
+        "state": {
+          "model": "eleven_text_to_sound_v3",
+          "kind": "sfx",
+          "format": "mp3_44100_128"
+        }
+      }
+    },
+    {
+      "name": "music without length is rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "music_v2",
+            "input": "lofi",
+            "voice": "alloy"
+          },
+          "model": "music_v2",
+          "stream": false
+        }
+      ],
+      "expectedError": "metadata.music_length_ms is required"
+    },
+    {
+      "name": "music length out of range",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "music_v2",
+            "input": "lofi",
+            "metadata": {
+              "music_length_ms": 700000
+            }
+          },
+          "model": "music_v2",
+          "stream": false
+        }
+      ],
+      "expectedError": "between 3000 and 600000"
+    },
+    {
+      "name": "sound effect without duration is rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_text_to_sound_v3",
+            "input": "rain"
+          },
+          "model": "eleven_text_to_sound_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "metadata.duration_seconds is required"
+    },
+    {
+      "name": "instructions are rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "Hi",
+            "voice": "alloy",
+            "instructions": "calm"
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "instructions is not supported"
+    },
+    {
+      "name": "sse stream format is rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "Hi",
+            "voice": "alloy",
+            "stream_format": "sse"
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "stream_format sse is not supported"
+    },
+    {
+      "name": "aac is rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "Hi",
+            "voice": "alloy",
+            "response_format": "aac"
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "is not supported; use mp3, opus, wav or pcm"
+    },
+    {
+      "name": "account-bound option is rejected",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "music_v2",
+            "input": "x",
+            "metadata": {
+              "music_length_ms": 10000,
+              "finetune_id": "ft"
+            }
+          },
+          "model": "music_v2",
+          "stream": false
+        }
+      ],
+      "expectedError": "metadata.finetune_id is not supported"
+    },
+    {
+      "name": "eleven_v3 character limit",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "voice": "alloy"
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "input is limited to 5000 characters"
+    },
+    {
+      "name": "eleven_v4 has no speed control",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v4",
+            "input": "Hi",
+            "voice": "alloy",
+            "speed": 0.9
+          },
+          "model": "eleven_v4",
+          "stream": false
+        }
+      ],
+      "expectedError": "eleven_v4 has no speed control"
+    },
+    {
+      "name": "other client paths are refused",
+      "hook": "convertRequest",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/chat/completions",
+          "config": {}
+        },
+        {
+          "body": {
+            "model": "eleven_v3",
+            "input": "Hi"
+          },
+          "model": "eleven_v3",
+          "stream": false
+        }
+      ],
+      "expectedError": "only serves /v1/audio/speech"
+    },
+    {
+      "name": "audio passes through with the upstream content type",
+      "hook": "convertResponse",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": {
+            "model": "eleven_v3",
+            "kind": "tts",
+            "format": "mp3_44100_128"
+          }
+        },
+        {
+          "status": 200,
+          "headers": {
+            "Content-Type": "audio/mpeg"
+          },
+          "bodyBase64": "SUQzBAD/+5AAgA=="
+        }
+      ],
+      "expected": {
+        "bodyBase64": "SUQzBAD/+5AAgA==",
+        "contentType": "audio/mpeg"
+      }
+    },
+    {
+      "name": "content type from the output format",
+      "hook": "convertResponse",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": {
+            "model": "eleven_v4",
+            "kind": "tts",
+            "format": "wav_44100"
+          }
+        },
+        {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/octet-stream"
+          },
+          "bodyBase64": "SUQzBAD/+5AAgA=="
+        }
+      ],
+      "expected": {
+        "bodyBase64": "SUQzBAD/+5AAgA==",
+        "contentType": "audio/wav"
+      }
+    },
+    {
+      "name": "ElevenLabs error keeps status and code",
+      "hook": "convertResponse",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": {
+            "format": "mp3_44100_128"
+          }
+        },
+        {
+          "status": 400,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"detail\":{\"status\":\"voice_not_found\",\"message\":\"A voice with voice_id x was not found.\"}}"
+        }
+      ],
+      "expected": {
+        "error": {
+          "status": 400,
+          "message": "ElevenLabs: A voice with voice_id x was not found.",
+          "type": "upstream_error",
+          "code": "voice_not_found"
+        }
+      }
+    },
+    {
+      "name": "validation error list",
+      "hook": "convertResponse",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": {
+            "format": "mp3_44100_128"
+          }
+        },
+        {
+          "status": 422,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"detail\":[{\"loc\":[\"body\",\"music_length_ms\"],\"msg\":\"Input should be less than or equal to 600000\"}]}"
+        }
+      ],
+      "expected": {
+        "error": {
+          "status": 422,
+          "message": "ElevenLabs: music_length_ms: Input should be less than or equal to 600000",
+          "type": "upstream_error",
+          "code": "invalid_request"
+        }
+      }
+    },
+    {
+      "name": "2xx without audio is an error",
+      "hook": "convertResponse",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": {
+            "format": "mp3_44100_128"
+          }
+        },
+        {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"detail\":{\"message\":\"odd\"}}"
+        }
+      ],
+      "expected": {
+        "error": {
+          "status": 502,
+          "message": "ElevenLabs returned no audio: odd",
+          "type": "upstream_error"
+        }
+      }
+    },
+    {
+      "name": "unexpected stream fails",
+      "hook": "convertStreamEvent",
+      "args": [
+        {
+          "baseUrl": "https://api.elevenlabs.io",
+          "path": "/v1/audio/speech",
+          "config": {},
+          "state": null
+        },
+        {
+          "data": "x"
+        }
+      ],
+      "expected": {
+        "error": {
+          "status": 502,
+          "message": "ElevenLabs answered with an unexpected stream.",
+          "type": "upstream_error"
+        }
+      }
+    }
+  ]
+}
