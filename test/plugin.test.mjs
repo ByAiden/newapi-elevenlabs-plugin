@@ -40,7 +40,7 @@ test("meta follows the community market rules", () => {
   assert.equal(meta.apiVersion, 1);
   assert.match(meta.key, /^[a-z0-9]+_elevenlabs$/);
   assert.ok(meta.key.length <= 30);
-  assert.equal(meta.version, "1.0.0");
+  assert.match(meta.version, /^\d+\.\d+\.\d+$/);
   assert.equal(meta.channelTypes, undefined);
   assert.equal(meta.baseUrl, "https://api.elevenlabs.io");
   assert.ok(meta.website.startsWith("https://"));
@@ -340,4 +340,12 @@ test("the billed quantities reach ElevenLabs unchanged", () => {
   const text = "你好，世界 hello";
   const tts = convert({ model: "eleven_v3", input: text, voice: "alloy" });
   assert.equal(tts.body.text, text);
+});
+
+test("both CHANGELOGs hold only the section of meta.version", () => {
+  for (const name of ["CHANGELOG.md", "CHANGELOG.zh-CN.md"]) {
+    const text = readFileSync(new URL("../" + name, import.meta.url), "utf8");
+    assert.match(text, new RegExp('\nversion: "' + meta.version.replace(/\./g, "\\.") + '"\n'));
+    assert.deepEqual(text.match(/^## \[.*\]$/gm), ["## [" + meta.version + "]"]);
+  }
 });

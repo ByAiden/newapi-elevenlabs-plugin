@@ -44,7 +44,7 @@ Request fields:
 
 - `model`, `input`: as in OpenAI speech.
 - `voice`: an ElevenLabs voice ID for text to speech, from the ElevenLabs voice library or `GET /v1/voices` on the ElevenLabs API. OpenAI voice names and an empty voice use the channel's default voice. Music and sound effects ignore it.
-- `response_format`: `mp3` (default, `mp3_44100_128`), `opus` (`opus_48000_128`), `wav` (`wav_44100`) or `pcm` (`pcm_24000`, the same 24 kHz 16-bit format as OpenAI). `metadata.output_format` takes any ElevenLabs output format instead, such as `mp3_44100_192` or `pcm_44100`; some formats need a higher ElevenLabs plan.
+- `response_format`: `mp3` (default, `mp3_44100_128`), `opus` (`opus_48000_128`), `wav` (`wav_44100`) or `pcm` (`pcm_24000`, the same 24 kHz 16-bit format as OpenAI). `metadata.output_format` takes any ElevenLabs output format instead, such as `mp3_44100_192` or `pcm_44100`; some formats need a higher ElevenLabs account tier.
 - `speed`: text to speech only, 0.7 to 1.2, sent as `voice_settings.speed`. `eleven_v4` has no speed control.
 - `metadata`: the ElevenLabs options. new-api passes only the OpenAI speech fields to the plugin, so every other option goes here:
   - Text to speech: `voice_id`, `voice_settings` (`stability`, `similarity_boost`, `style`, `speed`, `use_speaker_boost`, `clone_strength`), `language_code`, `seed`, `previous_text`, `next_text`, `apply_text_normalization`, `apply_language_text_normalization`, `use_pvc_as_ivc`, `audio_effects`, `output_format`.
@@ -65,6 +65,8 @@ new-api bills these requests itself, from the request: text to speech by the num
 | `eleven_text_to_sound_v3` | `tier("base", float(param("metadata.duration_seconds") ?? 0) * 2000)` |
 
 The factor is the price in USD per million units: characters for speech, milliseconds of music, seconds of sound. For example a 30-second song bills 30000 x 2.5 / 1,000,000 = USD 0.075, and a 5-second sound bills USD 0.01. The `?? 0` only keeps the expression valid when it is saved; requests without the length are rejected before they reach ElevenLabs.
+
+The gateway's model page shows the text to speech expressions as a price per million characters. The music and sound effect expressions read the length from the request (`param`), which the price table cannot show, so the page lists them as a special billing expression with the raw text; billing is exact either way. No expression that the price table can show charges by length: the table knows only prompt and completion tokens, and the gateway counts the prompt tokens of a music or sound request from its `input` text, not from its length.
 
 For text to speech, a model ratio works too: ratio 40 for v4, v3 and Multilingual v2 and ratio 20 for Flash charge the same per character, plus one character per request.
 

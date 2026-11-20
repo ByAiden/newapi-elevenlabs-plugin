@@ -42,7 +42,7 @@ locale: zh-CN
 
 - `model`、`input`：与 OpenAI 语音接口相同。
 - `voice`：文本转语音使用的 ElevenLabs 音色 ID，可在 ElevenLabs 音色库或 ElevenLabs API 的 `GET /v1/voices` 中查到。OpenAI 音色名和空值使用渠道的默认音色。音乐和音效忽略该字段。
-- `response_format`：`mp3`（默认，`mp3_44100_128`）、`opus`（`opus_48000_128`）、`wav`（`wav_44100`）或 `pcm`（`pcm_24000`，与 OpenAI 相同的 24 kHz 16 位格式）。也可以用 `metadata.output_format` 指定任意 ElevenLabs 输出格式，例如 `mp3_44100_192` 或 `pcm_44100`；部分格式需要更高的 ElevenLabs 套餐。
+- `response_format`：`mp3`（默认，`mp3_44100_128`）、`opus`（`opus_48000_128`）、`wav`（`wav_44100`）或 `pcm`（`pcm_24000`，与 OpenAI 相同的 24 kHz 16 位格式）。也可以用 `metadata.output_format` 指定任意 ElevenLabs 输出格式，例如 `mp3_44100_192` 或 `pcm_44100`；部分格式需要更高等级的 ElevenLabs 账户。
 - `speed`：仅文本转语音，0.7 到 1.2，作为 `voice_settings.speed` 发送。`eleven_v4` 不支持语速调节。
 - `metadata`：ElevenLabs 选项。new-api 只把 OpenAI 语音字段传给插件，其余选项都放在这里：
   - 文本转语音：`voice_id`、`voice_settings`（`stability`、`similarity_boost`、`style`、`speed`、`use_speaker_boost`、`clone_strength`）、`language_code`、`seed`、`previous_text`、`next_text`、`apply_text_normalization`、`apply_language_text_normalization`、`use_pvc_as_ivc`、`audio_effects`、`output_format`。
@@ -63,6 +63,8 @@ locale: zh-CN
 | `eleven_text_to_sound_v3` | `tier("base", float(param("metadata.duration_seconds") ?? 0) * 2000)` |
 
 系数是每百万单位的美元价格：语音为字符，音乐为毫秒，音效为秒。例如 30 秒的歌曲计费 30000 × 2.5 / 1,000,000 = 0.075 美元，5 秒的音效计费 0.01 美元。`?? 0` 只是为了让表达式能够保存；缺少时长的请求在发往 ElevenLabs 之前就会被拒绝。
+
+模型广场会把文本转语音的表达式显示为每百万字符的价格。音乐和音效的表达式从请求中读取时长（`param`），价格表无法展示，页面会显示为「特殊计费表达式」并列出原文；计费本身完全准确。价格表只认输入和输出 token，而网关按音乐或音效请求的 `input` 文本而不是时长计算输入 token，所以不存在既按时长计费又能显示成价格表的写法。
 
 文本转语音也可以使用模型倍率：v4、v3 和 Multilingual v2 设为 40，Flash 设为 20，按字符收费结果相同，另外每次请求多计 1 个字符。
 

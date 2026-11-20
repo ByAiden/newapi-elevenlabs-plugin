@@ -19,7 +19,7 @@ export const meta = {
   "apiVersion": 1,
   "key": "byaiden_elevenlabs",
   "name": { "en": "ElevenLabs", "zh": "ElevenLabs" },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": { "name": "ByAiden", "url": "https://github.com/ByAiden" },
   "description": {
     "en": "ElevenLabs text to speech, music and sound effects on the OpenAI-compatible speech endpoint",
